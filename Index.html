@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fux Ausreden Bingo</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #0000ff;
+            color: #333;
+        }
+
+        h1 {
+            background-color: #00fff2;
+            color: white;
+            margin: 0;
+            padding: 15px;
+            font-size: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .bingo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            place-content: center;
+            max-width: 320px;
+            margin: 30px auto;
+        }
+
+        .bingo-cell {
+            width: 100px;
+            height: 100px;
+            padding: 10px;
+            border-radius: 10px;
+            background: white;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s, color 0.3s;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bingo-cell:hover {
+            background: #e9ecef;
+        }
+
+        .bingo-cell.marked {
+            background: #28a745;
+            color: white;
+            box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .bingo-cell.marked::after {
+            content: '\2714';
+            font-size: 50px;
+            color: white;
+            opacity: 0.8;
+            position: absolute;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 12px 20px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #f30d0d;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Fux Ausreden Bingo</h1>
+    <div class="bingo-grid" id="bingoGrid"></div>
+    <button onClick="resetBingo()">Reset Bingo</button>
+    <script>
+        const words = [
+            "Muss mit Freundin was machen", "Muss zum Arzt Termin", "Mir ist kalt",
+            "Muss Schrank aufbauen", "Hab gerade kein Geld", "Bin am Zocken",
+            "Meine Eier tun weh", "Ich hab ne Krampfader am Sack", "Das ist mir zu weit"
+        ];
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function resetBingo() {
+            localStorage.setItem("markedIds", "");
+            location.reload();
+        }
+
+        function toggleMarked(gridCell) {
+            gridCell.classList.toggle('marked');
+            const cellId = Number(gridCell.id);
+            let selected = localStorage.getItem("markedIds") ? localStorage.getItem("markedIds").split(",").map(Number) : [];
+            if (selected.includes(cellId)) {
+                selected = selected.filter(id => id !== cellId);
+            } else {
+                selected.push(cellId);
+            }
+            localStorage.setItem("markedIds", selected.join(","));
+        }
+
+        function init() {
+            const grid = document.getElementById("bingoGrid");
+            const shuffledWords = shuffle(words);
+            let i = 0;
+
+            shuffledWords.slice(0, 9).forEach((word) => {
+                const cell = document.createElement("div");
+                cell.className = "bingo-cell";
+                cell.id = i;
+                cell.textContent = word;
+                cell.addEventListener("click", () => toggleMarked(cell));
+                grid.appendChild(cell);
+                i++;
+            });
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
