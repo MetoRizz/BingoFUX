@@ -26,16 +26,16 @@
 
         .bingo-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 8px;
             place-content: center;
-            max-width: 320px;
+            max-width: 500px;
             margin: 30px auto;
         }
 
         .bingo-cell {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             padding: 10px;
             border-radius: 10px;
             background: white;
@@ -48,10 +48,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        .bingo-cell:hover {
-            background: #e9ecef;
+            position: relative;
         }
 
         .bingo-cell.marked {
@@ -60,12 +57,9 @@
             box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .bingo-cell.marked::after {
-            content: '\2714';
-            font-size: 50px;
-            color: white;
-            opacity: 0.8;
-            position: absolute;
+        .bingo-cell.disabled {
+            pointer-events: none;
+            opacity: 0.5;
         }
 
         button {
@@ -83,6 +77,27 @@
         button:hover {
             background-color: #f30d0d;
         }
+
+        @keyframes confetti {
+            0% {
+                transform: translateY(0) rotate(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: red;
+            opacity: 0.7;
+            animation: confetti 3s ease-out infinite;
+        }
     </style>
 </head>
 
@@ -94,7 +109,13 @@
         const words = [
             "Muss mit Freundin was machen", "Muss zum Arzt Termin", "Mir ist kalt",
             "Muss Schrank aufbauen", "Hab gerade kein Geld", "Bin am Zocken",
-            "Meine Eier tun weh", "Ich hab ne Krampfader am Sack", "Das ist mir zu weit"
+            "Meine Eier tun weh", "Ich hab ne Krampfader am Sack", "Das ist mir zu weit",
+            "Ich hab Kopfschmerzen", "Mein Handy ist leer", "Meine Katze hat Geburtstag",
+            "Hab Muskelkater", "Mein Fahrrad ist kaputt", "Hab schon was vor",
+            "Bin zu müde", "Mein Internet geht nicht", "Ich muss lernen",
+            "Hab keinen Bock", "Es regnet draußen", "Mein Hund hat Durchfall",
+            "Meine Oma kommt zu Besuch", "Mein Controller ist kaputt", "Ich bin im Urlaub",
+            "Ich hab vergessen"
         ];
 
         function shuffle(array) {
@@ -108,14 +129,40 @@
 
         function toggleMarked(gridCell) {
             gridCell.classList.toggle('marked');
-            const cellId = Number(gridCell.id);
-            let selected = localStorage.getItem("markedIds") ? localStorage.getItem("markedIds").split(",").map(Number) : [];
-            if (selected.includes(cellId)) {
-                selected = selected.filter(id => id !== cellId);
-            } else {
-                selected.push(cellId);
+            checkBingo();
+        }
+
+        function checkBingo() {
+            const cells = document.querySelectorAll(".bingo-cell");
+            const grid = Array.from(cells).map(cell => cell.classList.contains("marked"));
+
+            for (let i = 0; i < 5; i++) {
+                if (grid.slice(i * 5, i * 5 + 5).every(Boolean) ||
+                    [0, 1, 2, 3, 4].map(x => grid[i + x * 5]).every(Boolean)) {
+                    celebrateWin();
+                    return;
+                }
             }
-            localStorage.setItem("markedIds", selected.join(","));
+            if ([0, 6, 12, 18, 24].map(x => grid[x]).every(Boolean) ||
+                [4, 8, 12, 16, 20].map(x => grid[x]).every(Boolean)) {
+                celebrateWin();
+            }
+        }
+
+        function celebrateWin() {
+            document.querySelectorAll(".bingo-cell").forEach(cell => cell.classList.add("disabled"));
+            for (let i = 0; i < 100; i++) {
+                createConfetti();
+            }
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement("div");
+            confetti.className = "confetti";
+            confetti.style.left = `${Math.random() * 100}vw`;
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 3000);
         }
 
         function init() {
@@ -123,7 +170,7 @@
             const shuffledWords = shuffle(words);
             let i = 0;
 
-            shuffledWords.slice(0, 9).forEach((word) => {
+            shuffledWords.slice(0, 25).forEach((word) => {
                 const cell = document.createElement("div");
                 cell.className = "bingo-cell";
                 cell.id = i;
