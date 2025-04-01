@@ -21,7 +21,7 @@ Falls du den Code selbst einfügen möchtest, folge diesen Schritten:
 - **Mac:** TextEdit (in den Einstellungen auf "Reiner Text" umstellen)
 - **Linux:** Gedit oder ein beliebiger Editor deiner Wahl
 
-**Schritt 2:** Kopiere den gesamten Bingo-Code und füge ihn in das geöffnete Editor-Fenster ein.
+**Schritt 2:** Kopiere alles aus index.html und füge ihn in das geöffnete Editor-Fenster ein.
 
 **Schritt 3:** Speichere die Datei mit der Endung **.html**:
 - Klicke auf **Datei > Speichern unter**
